@@ -103,6 +103,24 @@ function TimerDisplay({ type, timer, setDuration }: TimerDisplayProps) {
     e.preventDefault();
   }, []);
 
+  // Add current timer to page title if page is in the background
+  const [visible, setVisible] = useState(
+    window.document?.visibilityState !== "hidden"
+  );
+  useEffect(() => {
+    const handleChange = () =>
+      setVisible(window.document?.visibilityState !== "hidden");
+    window.document.addEventListener("visibilitychange", handleChange);
+    return () =>
+      window.document.addEventListener("visibilitychange", handleChange);
+  }, []);
+
+  useEffect(() => {
+    const m = Math.floor(minutes);
+    const s = `${Math.floor(seconds)}`.padStart(2, "0");
+    window.document.title = visible ? `stopme.io` : `${m}:${s} — stopme.io`;
+  }, [visible, minutes, seconds]);
+
   return (
     <Container>
       <Value

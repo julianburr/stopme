@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { readableColor } from "polished";
 import styled, { createGlobalStyle } from "styled-components";
 
@@ -16,12 +16,10 @@ import { WarningBanner } from "@/components/WarningBanner";
 import { TimerDisplay } from "@/components/TimerDisplay";
 import { TimerControls } from "@/components/TimerControls";
 import { ButtonBar } from "@/components/ButtonBar";
-import { Dialog } from "@/components/Dialog";
 import { CustomiseColorButton } from "@/components/buttons/CustomiseColorButton";
 import { AddContactsButton } from "@/components/buttons/AddContactsButton";
 import { ShareButton } from "@/components/buttons/ShareButton";
 import { ConfirmMobileButton } from "@/components/buttons/ConfirmMobileButton";
-// import { AuthButton } from "@/components/buttons/AuthButton";
 
 const GlobalStyles = createGlobalStyle<{ color: string }>`
   :root {
@@ -126,8 +124,6 @@ export default function Home() {
     setMounted(true);
   }, []);
 
-  const testDialog = useRef<HTMLDialogElement>(null);
-
   if (!mounted) {
     return null;
   }
@@ -172,15 +168,10 @@ export default function Home() {
             </ButtonBar>
             <ButtonBar>
               <ConfirmMobileButton />
-              {/* <AuthButton /> */}
             </ButtonBar>
           </Footer>
         </Content>
       </Container>
-
-      <Dialog id="dialog" ref={testDialog}>
-        <p>Hello world</p>
-      </Dialog>
     </>
   );
 }
