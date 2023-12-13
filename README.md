@@ -1,2 +1,3 @@
-# stopme
-Example SaaS app for DDD Brisbane talk
+# stopme.io
+
+Demo app for Web APIs talk.
