@@ -20,6 +20,7 @@ import { CustomiseColorButton } from "@/components/buttons/CustomiseColorButton"
 import { AddContactsButton } from "@/components/buttons/AddContactsButton";
 import { ShareButton } from "@/components/buttons/ShareButton";
 import { ConfirmMobileButton } from "@/components/buttons/ConfirmMobileButton";
+import { PromptButton } from "@/components/buttons/PromptButton";
 
 const GlobalStyles = createGlobalStyle<{ color: string }>`
   :root {
@@ -119,6 +120,8 @@ export default function Home() {
     duration: params.duration,
   });
 
+  console.log({ params, timer });
+
   const [mounted, setMounted] = useState(false);
   useEffect(() => {
     setMounted(true);
@@ -143,25 +146,29 @@ export default function Home() {
           <Main>
             <TypeTabs
               type={params.type}
-              setType={(value) => setParam("type", value)}
+              setType={(value) => setParam({ type: value })}
             />
             <TimerName
               name={params.name}
-              setName={(value) => setParam("name", value)}
+              setName={(value) => setParam({ name: value })}
             />
 
             <TimerDisplay
-              type={params.type}
               timer={timer}
-              setDuration={(value) => setParam("duration", value)}
+              setDuration={(value) => setParam({ duration: value })}
             />
             <TimerControls type={params.type} timer={timer} />
           </Main>
 
           <Footer>
             <ButtonBar>
+              <PromptButton
+                setDuration={(value) =>
+                  setParam({ type: "countdown", duration: value })
+                }
+              />
               <CustomiseColorButton
-                setColor={(value) => setParam("color", value)}
+                setColor={(value) => setParam({ color: value })}
               />
               <AddContactsButton />
               <ShareButton name={params.name} />

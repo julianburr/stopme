@@ -9,6 +9,7 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "marked": "^14.1.2",
     "next": "14.0.4",
     "polished": "^4.2.2",
     "react": "^18",

@@ -37,12 +37,11 @@ const Value = styled.span`
 `;
 
 type TimerDisplayProps = {
-  type: "stopwatch" | "countdown";
   timer: any;
   setDuration: (value: number) => any;
 };
 
-function TimerDisplay({ type, timer, setDuration }: TimerDisplayProps) {
+function TimerDisplay({ timer, setDuration }: TimerDisplayProps) {
   const [minutes, setMinutes] = useState(timer.display / 1000 / 60);
   const [seconds, setSeconds] = useState((timer.display / 1000) % 60);
   useEffect(() => {
@@ -108,8 +107,10 @@ function TimerDisplay({ type, timer, setDuration }: TimerDisplayProps) {
     window.document?.visibilityState !== "hidden"
   );
   useEffect(() => {
-    const handleChange = () =>
+    const handleChange = () => {
+      console.log({ visibilityState: window.document?.visibilityState });
       setVisible(window.document?.visibilityState !== "hidden");
+    };
     window.document.addEventListener("visibilitychange", handleChange);
     return () =>
       window.document.addEventListener("visibilitychange", handleChange);

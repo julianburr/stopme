@@ -32,7 +32,7 @@ type State = {
   name?: string;
 };
 
-type SetState = (key: keyof State, value: any) => any;
+type SetState = (state: Partial<State>) => any;
 
 function useParsedRoute(): [State, SetState] {
   const hash = typeof window !== "undefined" ? window.location.hash : "";
@@ -43,8 +43,8 @@ function useParsedRoute(): [State, SetState] {
   );
 
   const set = useCallback<SetState>(
-    (key, value) => {
-      const newValue = { ...params, [key]: value };
+    (state) => {
+      const newValue = { ...params, ...state };
       setParams(newValue);
 
       const newHash = window.btoa(JSON.stringify(newValue));

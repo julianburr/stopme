@@ -1,4 +1,4 @@
-import { Fragment, useRef, useState } from "react";
+import { Fragment, useCallback, useEffect, useRef, useState } from "react";
 
 import { IconButton } from "@/components/IconButton";
 import { Dialog } from "@/components/Dialog";
@@ -54,6 +54,36 @@ function ConfirmMobileButton({ name }: ConfirmMobileButtonProps) {
   const [sent, setSent] = useState(false);
   const [verified, setVerified] = useState(false);
 
+  const handleSubmit = useCallback(() => {
+    const cleanNumber = mobile.current?.value
+      ?.replace(/\s/g, "")
+      ?.replace(/^0/, "+61");
+    if (cleanNumber) {
+      if (navigator.credentials) {
+        const ac = new AbortController();
+        (navigator.credentials as any)
+          .get({
+            otp: { transport: ["sms"] },
+            signal: ac.signal,
+          })
+          .then((otp: any) => {
+            if (otp.code && code.current) {
+              code.current.value = otp.code;
+            }
+          });
+      }
+      fetch("/api/send-sms", {
+        method: "POST",
+        body: JSON.stringify({ number: cleanNumber }),
+      });
+      setSent(true);
+    }
+  }, []);
+
+  const handleVerify = useCallback(() => {
+    setVerified(true);
+  }, []);
+
   return (
     <>
       <IconButton
@@ -69,6 +99,13 @@ function ConfirmMobileButton({ name }: ConfirmMobileButtonProps) {
           setSent(false);
           setVerified(false);
         }}
+        buttons={
+          verified ? null : sent ? (
+            <Button onClick={handleVerify}>Verify</Button>
+          ) : (
+            <Button onClick={handleSubmit}>Submit</Button>
+          )
+        }
       >
         <Content>
           {verified ? (
@@ -83,46 +120,22 @@ function ConfirmMobileButton({ name }: ConfirmMobileButtonProps) {
             <Fragment key="code">
               <Label>Enter verification code:</Label>
               <Input ref={code} name="code" type="number" />
-              <Button onClick={() => setVerified(true)}>Verify</Button>
             </Fragment>
           ) : (
             <Fragment key="number">
-              <Label>Enter your mobile number:</Label>
+              <Label>Enter your phone number to receive OTP:</Label>
               <Input
                 ref={mobile}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") {
+                    e.preventDefault();
+                    handleSubmit();
+                  }
+                }}
                 name="mobile"
                 type="tel"
                 autoComplete="mobile"
               />
-              <Button
-                onClick={() => {
-                  const cleanNumber = mobile.current?.value
-                    ?.replace(/\s/g, "")
-                    ?.replace(/^0/, "+61");
-                  if (cleanNumber) {
-                    if (navigator.credentials) {
-                      const ac = new AbortController();
-                      (navigator.credentials as any)
-                        .get({
-                          otp: { transport: ["sms"] },
-                          signal: ac.signal,
-                        })
-                        .then((otp: any) => {
-                          if (otp.code && code.current) {
-                            code.current.value = otp.code;
-                          }
-                        });
-                    }
-                    fetch("/api/send-sms", {
-                      method: "POST",
-                      body: JSON.stringify({ number: cleanNumber }),
-                    });
-                    setSent(true);
-                  }
-                }}
-              >
-                Submit
-              </Button>
             </Fragment>
           )}
         </Content>
