@@ -81,7 +81,7 @@ const Button = styled.button`
 `;
 
 type PromptButtonProps = {
-  setDuration?: (value: number) => any;
+  setDuration?: (value: number, name?: string) => any;
 };
 
 function PromptButton({ setDuration }: PromptButtonProps) {
@@ -100,7 +100,7 @@ function PromptButton({ setDuration }: PromptButtonProps) {
       setSubmitting(true);
       setSubmittedPrompt(val);
 
-      const session = await (window as any).ai?.assistant?.create?.();
+      const session = await (window as any).ai?.languageModel?.create?.();
       const result = await session?.prompt?.(`
         You are a chatbot that helps the user to determine how long they need to
         set a timer for.
@@ -123,6 +123,8 @@ function PromptButton({ setDuration }: PromptButtonProps) {
 
       console.log({ result, parsed, time });
     } catch (e) {
+      console.log("@catch", { e });
+
       setResult(null);
       setParsed(0);
 
@@ -159,8 +161,7 @@ function PromptButton({ setDuration }: PromptButtonProps) {
               <Button onClick={handleReset}>Reset</Button>
               <PrimaryButton
                 onClick={() => {
-                  console.log({ parsed });
-                  setDuration?.(parsed);
+                  setDuration?.(parsed, submittedPrompt);
                   dialog.current?.close();
                   handleReset();
                 }}

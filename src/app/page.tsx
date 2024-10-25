@@ -163,8 +163,12 @@ export default function Home() {
           <Footer>
             <ButtonBar>
               <PromptButton
-                setDuration={(value) =>
-                  setParam({ type: "countdown", duration: value })
+                setDuration={(value, name) =>
+                  setParam({
+                    type: "countdown",
+                    duration: value,
+                    name: name || "",
+                  })
                 }
               />
               <CustomiseColorButton

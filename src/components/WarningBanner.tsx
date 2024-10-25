@@ -31,9 +31,14 @@ function WarningBanner({ duration = 0 }: WarningBannerProps) {
   useEffect(() => {
     navigator?.getBattery?.()?.then((battery: any) => {
       const handleChange = () => {
-        setBattery(
-          !!battery.charging || duration / 1000 < battery.dischargingTime
-        );
+        // NOTE: just for demo purposes bypass actual battery check
+        if (duration > 9999 * 60_000) {
+          setBattery(false);
+        } else {
+          setBattery(
+            !!battery.charging || duration / 1000 < battery.dischargingTime
+          );
+        }
       };
       handleChange();
       battery.addEventListener("chargingchange", handleChange);
