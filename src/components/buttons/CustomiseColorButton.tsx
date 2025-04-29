@@ -1,4 +1,4 @@
-import { useMemo, useRef } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import styled from "styled-components";
 
 import { IconButton } from "@/components/IconButton";
@@ -7,6 +7,12 @@ import { Dialog } from "@/components/Dialog";
 import PaintBucketSvg from "@/assets/paint-bucket.svg";
 import PipetteSvg from "@/assets/pipette.svg";
 import { colors } from "@/utils/useParsedRoute";
+
+const Container = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+`;
 
 const ColorGrid = styled.div`
   display: grid;
@@ -38,12 +44,49 @@ const ColorButton = styled.button<{ background?: string }>`
   }
 `;
 
+const InputContainer = styled.div`
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  gap: 0.3rem;
+`;
+
+const Input = styled.input`
+  border: 0 none;
+  border-radius: 0.4rem;
+  background: var(--color--grey);
+  padding: 0.6rem;
+  font-size: 1.4em;
+  width: 6.4rem;
+`;
+
+const Button = styled.button`
+  border: 0 none;
+  border-radius: 0.4rem;
+  background: var(--color--main);
+  color: var(--color--contrast);
+  padding: 0.8rem;
+  transition: transform 0.2s;
+
+  &:hover,
+  &:focus {
+    transform: scale(1.02);
+  }
+`;
+
 type CustomiseColorButtonProps = {
+  color: string;
   setColor: (value: string) => any;
 };
 
-function CustomiseColorButton({ setColor }: CustomiseColorButtonProps) {
+function CustomiseColorButton({ color, setColor }: CustomiseColorButtonProps) {
   const dialog = useRef<HTMLDialogElement>(null);
+  const [value, setValue] = useState(color);
+
+  useEffect(() => {
+    setValue(color);
+  }, [color]);
 
   const choices = useMemo(() => {
     const choices = [
@@ -59,6 +102,15 @@ function CustomiseColorButton({ setColor }: CustomiseColorButtonProps) {
     return window.EyeDropper ? choices.slice(0, -1) : choices;
   }, []);
 
+  const handleSet = useCallback(() => {
+    if (!/^#([0-9A-F]{3}){1,2}$/i.test(value)) {
+      return;
+    }
+    setColor(value);
+    setValue(value);
+    dialog.current?.close();
+  }, [value, setColor]);
+
   return (
     <>
       <IconButton
@@ -69,31 +121,43 @@ function CustomiseColorButton({ setColor }: CustomiseColorButtonProps) {
       </IconButton>
 
       <Dialog ref={dialog}>
-        <ColorGrid>
-          {choices.map((color) => (
-            <ColorButton
-              key={color}
-              background={color}
-              onClick={() => {
-                setColor(color);
-                dialog.current?.close();
-              }}
-            />
-          ))}
-          {window.EyeDropper && (
-            <ColorButton
-              onClick={() => {
-                const eyeDropper = new window.EyeDropper();
-                eyeDropper.open().then((result: any) => {
-                  setColor(result.sRGBHex);
+        <Container>
+          <ColorGrid>
+            {choices.map((color) => (
+              <ColorButton
+                key={color}
+                background={color}
+                onClick={() => {
+                  setColor(color);
                   dialog.current?.close();
-                });
-              }}
-            >
-              <PipetteSvg />
-            </ColorButton>
-          )}
-        </ColorGrid>
+                }}
+              />
+            ))}
+            {window.EyeDropper && (
+              <ColorButton
+                onClick={() => {
+                  const eyeDropper = new window.EyeDropper();
+                  eyeDropper.open().then((result: any) => {
+                    setColor(result.sRGBHex);
+                    dialog.current?.close();
+                  });
+                }}
+              >
+                <PipetteSvg />
+              </ColorButton>
+            )}
+          </ColorGrid>
+
+          <InputContainer>
+            <Input
+              type="text"
+              placeholder="#"
+              value={value}
+              onChange={(e) => setValue(e.target.value)}
+            />
+            <Button onClick={handleSet}>Set</Button>
+          </InputContainer>
+        </Container>
       </Dialog>
     </>
   );

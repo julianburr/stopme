@@ -1,4 +1,3 @@
-import { NextApiRequest } from "next";
 import createClient from "twilio";
 import { NextResponse } from "next/server";
 
@@ -14,10 +13,11 @@ export async function POST(req: Request) {
       ? `+61${body?.number.substring(1)}`
       : body?.number;
 
+    const code = Math.floor(100000 + Math.random() * 900000).toString();
     const message = await client.messages.create({
       from: "+12015966972",
       to: number,
-      body: `Your verification code is 123456.\n\n@app.stopme.io #123456`,
+      body: `Your verification code is ${code}.\n\n@app.stopme.io #${code}`,
     });
 
     return NextResponse.json({ message });

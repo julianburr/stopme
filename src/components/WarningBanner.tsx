@@ -27,16 +27,16 @@ type WarningBannerProps = {
 
 function WarningBanner({ duration = 0 }: WarningBannerProps) {
   // Warning if battery level is not enough to finish the current timer
-  const [battery, setBattery] = useState(false);
+  const [showBatteryWarning, setShowBatteryWarning] = useState(false);
   useEffect(() => {
     navigator?.getBattery?.()?.then((battery: any) => {
       const handleChange = () => {
         // NOTE: just for demo purposes bypass actual battery check
         if (duration > 9999 * 60_000) {
-          setBattery(false);
+          setShowBatteryWarning(true);
         } else {
-          setBattery(
-            !!battery.charging || duration / 1000 < battery.dischargingTime
+          setShowBatteryWarning(
+            !battery.charging && duration / 1000 >= battery.dischargingTime
           );
         }
       };
@@ -47,15 +47,17 @@ function WarningBanner({ duration = 0 }: WarningBannerProps) {
   }, [duration]);
 
   // Separate warning if user is offline
-  const [online, setOnline] = useState(navigator.onLine);
+  const [showNetworkWarning, setShowNetworkWarning] = useState(
+    !navigator.onLine
+  );
   useEffect(() => {
-    const handleChange = () => setOnline(navigator.onLine);
+    const handleChange = () => setShowNetworkWarning(!navigator.onLine);
     navigator.connection?.addEventListener?.("change", handleChange);
     return () =>
       navigator.connection?.removeEventListener?.("change", handleChange);
   }, []);
 
-  if (!battery) {
+  if (showBatteryWarning) {
     return (
       <Container>
         <BatterySvg />
@@ -64,7 +66,7 @@ function WarningBanner({ duration = 0 }: WarningBannerProps) {
     );
   }
 
-  if (!online) {
+  if (showNetworkWarning) {
     return (
       <Container>
         <AlertSvg />

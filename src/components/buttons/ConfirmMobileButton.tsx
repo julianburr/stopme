@@ -17,12 +17,49 @@ const Label = styled.span`
   font-size: 0.8rem;
 `;
 
+const WrapInput = styled.div`
+  display: flex;
+  flex-direction: row;
+  gap: 0.3rem;
+  align-items: center;
+  justify-content: center;
+  background: var(--color--grey);
+  font-size: 1.4em;
+  padding: 0.8rem;
+  width: 100%;
+
+  &:focus-within {
+    outline: -webkit-focus-ring-color auto 1px;
+  }
+`;
+
+const CountryCode = styled.span`
+  display: flex;
+  flex-shrink: 0;
+  font-size: 0.8em;
+  color: var(--color--dark);
+  opacity: 0.5;
+`;
+
 const Input = styled.input`
   border: 0 none;
   border-radius: 0.4rem;
-  background: var(--color--grey);
-  padding: 0.8rem;
   font-size: 1.4em;
+  background: transparent;
+  width: 10rem;
+
+  &:focus {
+    outline: none;
+  }
+`;
+
+const CodeInput = styled.input`
+  border: 0 none;
+  border-radius: 0.4rem;
+  background: var(--color--grey);
+  font-size: 1.4em;
+  padding: 0.8rem;
+  width: 100%;
 `;
 
 const Button = styled.button`
@@ -57,7 +94,7 @@ function ConfirmMobileButton({ name }: ConfirmMobileButtonProps) {
   const handleSubmit = useCallback(() => {
     const cleanNumber = mobile.current?.value
       ?.replace(/\s/g, "")
-      ?.replace(/^0/, "+61");
+      ?.replace(/^0/, "");
     if (cleanNumber) {
       if (navigator.credentials) {
         const ac = new AbortController();
@@ -74,7 +111,7 @@ function ConfirmMobileButton({ name }: ConfirmMobileButtonProps) {
       }
       fetch("/api/send-sms", {
         method: "POST",
-        body: JSON.stringify({ number: cleanNumber }),
+        body: JSON.stringify({ number: `+61${cleanNumber}` }),
       });
       setSent(true);
     }
@@ -119,23 +156,26 @@ function ConfirmMobileButton({ name }: ConfirmMobileButtonProps) {
           ) : sent ? (
             <Fragment key="code">
               <Label>Enter verification code:</Label>
-              <Input ref={code} name="code" type="number" />
+              <CodeInput ref={code} name="code" type="number" />
             </Fragment>
           ) : (
             <Fragment key="number">
               <Label>Enter your phone number to receive OTP:</Label>
-              <Input
-                ref={mobile}
-                onKeyDown={(e) => {
-                  if (e.key === "Enter") {
-                    e.preventDefault();
-                    handleSubmit();
-                  }
-                }}
-                name="mobile"
-                type="tel"
-                autoComplete="mobile"
-              />
+              <WrapInput>
+                <CountryCode>+61</CountryCode>
+                <Input
+                  ref={mobile}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter") {
+                      e.preventDefault();
+                      handleSubmit();
+                    }
+                  }}
+                  name="mobile"
+                  type="tel"
+                  autoComplete="mobile"
+                />
+              </WrapInput>
             </Fragment>
           )}
         </Content>

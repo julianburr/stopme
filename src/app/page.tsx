@@ -120,8 +120,6 @@ export default function Home() {
     duration: params.duration,
   });
 
-  console.log({ params, timer });
-
   const [mounted, setMounted] = useState(false);
   useEffect(() => {
     setMounted(true);
@@ -172,6 +170,7 @@ export default function Home() {
                 }
               />
               <CustomiseColorButton
+                color={params.color}
                 setColor={(value) => setParam({ color: value })}
               />
               <AddContactsButton />
