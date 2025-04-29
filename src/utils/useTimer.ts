@@ -107,10 +107,6 @@ function useTimer({ type, duration = 0, name }: UseTimerArg) {
   const lastType = useRef(type);
   const lastDuration = useRef(duration);
   useEffect(() => {
-    console.log("@reset", {
-      typeCheck: type !== lastType.current,
-      durationCheck: duration !== lastDuration.current,
-    });
     if (type !== lastType.current || duration !== lastDuration.current) {
       reset();
     }

@@ -74,7 +74,6 @@ function TimerDisplay({ timer, setDuration }: TimerDisplayProps) {
   }, [setDuration]);
 
   const handleKeyDown = useCallback((e: KeyboardEvent<HTMLSpanElement>) => {
-    console.log({ e });
     const target = e.target as any;
     if (e.key.match(/[0-9]/)) {
       if (
@@ -108,7 +107,6 @@ function TimerDisplay({ timer, setDuration }: TimerDisplayProps) {
   );
   useEffect(() => {
     const handleChange = () => {
-      console.log({ visibilityState: window.document?.visibilityState });
       setVisible(window.document?.visibilityState !== "hidden");
     };
     window.document.addEventListener("visibilitychange", handleChange);

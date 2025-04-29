@@ -77,11 +77,6 @@ const Dialog = forwardRef(function Dialog(
     const content = contentRef.current;
     if (container && content) {
       const handleScroll = () => {
-        console.log({
-          scrollHeight: content.scrollHeight,
-          scrollTop: content.scrollTop,
-          clientHeight: content.clientHeight,
-        });
         setScrollable(
           content.scrollHeight > content.scrollTop + content.clientHeight
         );

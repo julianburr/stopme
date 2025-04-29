@@ -135,6 +135,12 @@ function ConfirmMobileButton({ name }: ConfirmMobileButtonProps) {
         onClose={() => {
           setSent(false);
           setVerified(false);
+          if (code.current) {
+            code.current.value = "";
+          }
+          if (mobile.current) {
+            mobile.current.value = "";
+          }
         }}
         buttons={
           verified ? null : sent ? (
@@ -156,7 +162,19 @@ function ConfirmMobileButton({ name }: ConfirmMobileButtonProps) {
           ) : sent ? (
             <Fragment key="code">
               <Label>Enter verification code:</Label>
-              <CodeInput ref={code} name="code" type="number" />
+              <CodeInput
+                ref={code}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") {
+                    e.preventDefault();
+                    handleVerify();
+                  }
+                }}
+                name="code"
+                type="number"
+                autoComplete="one-time-code"
+                required
+              />
             </Fragment>
           ) : (
             <Fragment key="number">
@@ -174,6 +192,7 @@ function ConfirmMobileButton({ name }: ConfirmMobileButtonProps) {
                   name="mobile"
                   type="tel"
                   autoComplete="mobile"
+                  required
                 />
               </WrapInput>
             </Fragment>

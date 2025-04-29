@@ -93,6 +93,18 @@ function PromptButton({ setDuration }: PromptButtonProps) {
   const [parsed, setParsed] = useState<number>(0);
   const [submittedPrompt, setSubmittedPrompt] = useState("");
 
+  const [isAvailable, setIsAvailable] = useState(false);
+  useEffect(() => {
+    const checkAvailability = async () => {
+      const availability = await (
+        window as any
+      ).LanguageModel?.availability?.();
+      console.log({ availability });
+      setIsAvailable(availability === "available");
+    };
+    checkAvailability();
+  }, []);
+
   const handleSubmit = useCallback(async () => {
     try {
       const val = prompt.current?.value || "";
@@ -100,7 +112,12 @@ function PromptButton({ setDuration }: PromptButtonProps) {
       setSubmitting(true);
       setSubmittedPrompt(val);
 
-      const session = await (window as any).ai?.languageModel?.create?.();
+      console.log("@before");
+      const session = await (window as any).LanguageModel?.create?.({
+        temperature: 0.64,
+        topK: 10,
+      });
+      console.log({ session });
       const result = await session?.prompt?.(`
         You are a chatbot that helps the user to determine how long they need to
         set a timer for.
@@ -108,12 +125,15 @@ function PromptButton({ setDuration }: PromptButtonProps) {
         ${val}
       `);
 
+      console.log({ result });
+
       const html = await marked.parse(result);
       setResult(html);
 
       const parsed = await session?.prompt?.(`
-        Extract the first time (in minutes) expression mentioned given text. Return the 
-        output in the format "Time: {time in minutes}". 
+        You are given a text that contains a duration, which we want to set in a timer.
+        Extract the time from the given text and return it in minutes. The 
+        format should be: "Time: {time in minutes}". 
         The text to extract the time from is:
         ${result}
       `);
@@ -143,7 +163,7 @@ function PromptButton({ setDuration }: PromptButtonProps) {
   const parsedMins = Math.floor(parsed / 60_000);
   const parsedSeconds = `${Math.floor(parsed % 60_000)}`.padStart(2, "0");
 
-  if (typeof window === "undefined" || !("ai" in window)) {
+  if (!isAvailable) {
     return null;
   }
 
